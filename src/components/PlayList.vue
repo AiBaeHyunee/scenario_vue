@@ -78,12 +78,29 @@
                                         <div class="btn-group">
                                             <a :id="item.play_number" @click="changePlay(item.play_number)" class="btn btn-xs btn-default" title="编辑" data-toggle="tooltip"><i class="mdi mdi-pencil"></i></a>
 <!--                                            <a class="btn btn-xs btn-default" href="#!" title="查看" data-toggle="tooltip"><i class="mdi mdi-eye"></i></a>-->
-                                            <a :id="item.play_number" @click="deletePlay(item.play_number)" class="btn btn-xs btn-default" title="删除" data-toggle="tooltip"><i class="mdi mdi-window-close"></i></a>
+                                            <a :id="item.play_number" @click="deletePlay(item.play_number,item.play_name)" class="btn btn-xs btn-default" title="删除" data-toggle="modal" data-target=".bs-example-modal-sm"><i class="mdi mdi-window-close"></i></a>
                                         </div>
                                     </td>
                                 </tr>
                                 </tbody>
                             </table>
+                            <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+                                <div class="modal-dialog modal-sm" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" id="closeButton" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                            <h4 class="modal-title" id="myLargeModalLabel">确认弹框</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            确认删除{{showplayName}}吗？
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                            <button type="button" class="btn btn-primary" @click="dodel">确认删除</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 <!--                        分页-->
 <!--                        <ul class="pagination">-->
@@ -120,14 +137,20 @@
         data(){
             return{
                 playtype_click:'全部',//选择剧本种类
-                playName:"",
-                playList:[]
+                playName:"",//确定搜索框是否为空
+                playList:[],
+                //实现删除传参
+                playNumber:"",
+                showplayName:""
             }
         },
 
         // 调用父页面方法
         inject:['changeTitle'],        //页面加载---生命周期
         mounted() {
+            let recaptchaScript1 = document.createElement('script')
+            recaptchaScript1.setAttribute('src', './static/js/jconfirm/jquery-confirm.min.js')
+            document.head.appendChild(recaptchaScript1)
             this.changeTitle('剧本-剧本列表')
             this.loadPlaylist()
         },
@@ -210,17 +233,21 @@
                 )
             },
             //删除所选剧本
-            deletePlay:function(playNumber){
-                console.log("删除所选剧本")
+            deletePlay:function(playNumber,playname){
+                this.playNumber = playNumber
+                this.showplayName = playname
+            },
+            dodel:function(){
                 var that=this
-                // let playNumber=event.target.id
-                console.log(playNumber)
+                console.log("删除所选剧本")
                 axios.post(that.GLOBAL.API_ROOT + "/delete_play", qs.stringify({
-                    "playNumber": playNumber,
+                    "playNumber": that.playNumber,
                 })).then(
                     function (response) {
-                        console.log(response);
-                        that.loadPlaylist();
+                        if(response.data.status == "ok"){
+                            document.getElementById('closeButton').click();
+                            that.loadPlaylist();
+                        }
                     },
                     function (err) {
                         console.log(err);

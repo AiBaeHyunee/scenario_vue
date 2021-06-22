@@ -17,7 +17,7 @@
                         <span class="mdi mdi-lock form-control-feedback" aria-hidden="true"></span>
                     </div>
                     <div class="form-group">
-                        <button class="btn btn-block btn-primary" type="button" @click="login">立即登录</button>
+                        <button class="btn btn-block btn-brown" type="button" @click="login">立即登录</button>
                     </div>
                 </form>
 <!--                <footer class="col-sm-12 text-center text-white">-->
